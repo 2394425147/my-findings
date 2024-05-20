@@ -4,9 +4,9 @@
 
 If you've tried to make rhythm games in Unity, chances are, you'll run into problems using Unity's built-in audio system:
 
-If you use `AudioSource.Time` to determine the time, you may find it hard to extrapolate time to before the song starts (for a countdown before notes spawn), or after the song ends (to give a brief moment of silence before showing the results).
+If you use `AudioSource.Time` to determine the time, you may find it hard to extrapolate time to before the song starts (for a countdown before notes spawn), or after the song ends (to give a brief moment of silence before showing the results screen).
 
-On the other hand, `AudioSettings.dspTime`, although providing an accurate timestamp that isn't confined to the range of audio clips, it only points to the **start** position of the current audio buffer, giving the same value across multiple frames.
+On the other hand, `AudioSettings.dspTime` *does* provide an accurate and unconfined timestamp, its values can only be the **start** positions of each audio buffer, causing the same value to be returned across multiple frames.
 
 Here's a rough depiction of how this works:
 
@@ -14,7 +14,7 @@ Here's a rough depiction of how this works:
 
 To address this issue, we could use **linear regression** to map the accurate but buffered `dspTime` to the less accurate but smooth `Time.realtimeSinceStartup`, and this works surprisingly well!
 
-Check out [Freya Holmér's xeet](https://twitter.com/FreyaHolmer/status/845954862403780609) on X (formerly Twitter) for a different visualization and a comparison between different timing methods.
+Check out [Freya Holmér's xeet](https://twitter.com/FreyaHolmer/status/845954862403780609) on Twitter (formerly X) for a different visualization and a comparison between different timing methods.
 
 ## The pause-resume problem
 
