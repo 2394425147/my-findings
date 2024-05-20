@@ -10,7 +10,7 @@ On the other hand, `AudioSettings.dspTime`, although providing an accurate times
 
 Here's a rough depiction of how this works:
 
-![A timeline showing the current buffer time being 2, yet the actual time is 2.42.](.\FixingUnitysAudioProblem\BufferExplanation.png)
+![A timeline showing the current buffer time being 2, yet the actual time is 2.42.](./FixingUnitysAudioProblem/BufferExplanation.png)
 
 To address this issue, we could use **linear regression** to map the accurate but buffered `dspTime` to the less accurate but smooth `Time.realtimeSinceStartup`, and this works surprisingly well!
 
@@ -30,7 +30,7 @@ Here's an excerpt from [hydrogenaudio's wiki page on variable bitrate (VBR) .mp3
 
 As you can see, audio seeking gets way more inaccurate as the seek table size decreases.
 
-![Music time desyncs with dspTime, as it moves to a position described by the seek table, while dspTime is unaffected and resumes from its original position.](.\FixingUnitysAudioProblem\SeekTableExplanation.png)
+![Music time desyncs with dspTime, as it moves to a position described by the seek table, while dspTime is unaffected and resumes from its original position.](./FixingUnitysAudioProblem/SeekTableExplanation.png)
 
 At the moment, I haven't found a fix within Unity that can be pulled off quite easily, so unfortunately, if you don't want to use any 3rd party libraries, you'll have to use an audio format that don't uses seek tables, like [ogg vorbis](https://xiph.org/vorbis/)!
 
@@ -50,31 +50,31 @@ So, they provide a way to scan an audio stream before playback to basically elim
 
 Let's first grab the appropriate DLLs from the BASS homepage. You can find them on the right of the download label.
 
-![BASS's homepage header, with 5 download links for different platform targets on the right.](.\FixingUnitysAudioProblem\WhereToDownloadBass.png)
+![BASS's homepage header, with 5 download links for different platform targets on the right.](./FixingUnitysAudioProblem/WhereToDownloadBass.png)
 
 Additionally, we'll need BASSmix, an add-on for channel mixing. We'll need this to retrieve time that isn't restrained to the bounds of audio clips, as mentioned above. It also handles time smoothing by itself, which is really cool.
 
 You can find BASSmix a few scrolls down the page.
 
-![The download links for BASSmix on the homepage.](.\FixingUnitysAudioProblem\WhereToDownloadBassMix.png)
+![The download links for BASSmix on the homepage.](./FixingUnitysAudioProblem/WhereToDownloadBassMix.png)
 
 Then let's put all its included libraries inside Unity. Create a `Plugin` folder, and two separate folders for the core BASS library, and another for the BASSmix library. Inside each of them, extract the binaries for each platform.
 
-![Three BASS binary folders inside the directory Assets/Plugins/Un4seen.Bass/Core.](.\FixingUnitysAudioProblem\PuttingBassInUnity.png)
+![Three BASS binary folders inside the directory Assets/Plugins/Un4seen.Bass/Core.](./FixingUnitysAudioProblem/PuttingBassInUnity.png)
 
 Click on each of the binaries, and make sure they're loaded on the correct platforms.
 
-![The inspector window for a 32-bit Windows BASS binary, with the standalone x86 option enabled.](.\FixingUnitysAudioProblem\BassPluginPlatformSettings)
+![The inspector window for a 32-bit Windows BASS binary, with the standalone x86 option enabled.](./FixingUnitysAudioProblem/BassPluginPlatformSettings)
 
 Since BASS is compiled from C, it might be a good idea to grab a wrapper so we don't need to deal with those `DLLImport`s. I'll use [ManagedBASS](https://github.com/ManagedBass/ManagedBass) for this post.
 
 ManagedBASS is available as a NuGet package. To use it in Unity, you can use [NuGetForUnity](https://github.com/GlitchEnzo/NuGetForUnity). Install it into your project, search for ManagedBASS, and install their wrappers for both BASS and BASSmix.
 
-![ManagedBASS wrappers in NuGetForUnity, with its BASS wrapper named ManagedBass, and its BASSmix wrapper named ManagedBass.Mix](.\FixingUnitysAudioProblem\WhereToDownloadBassWrappers.png)
+![ManagedBASS wrappers in NuGetForUnity, with its BASS wrapper named ManagedBass, and its BASSmix wrapper named ManagedBass.Mix](./FixingUnitysAudioProblem/WhereToDownloadBassWrappers.png)
 
 Optionally, if you're going all in with BASS, you can disable Unity's audio system under _Edit -> Project Settings -> Project -> Audio_.
 
-![The project settings window, with the Disable Unity Audio option highlighted](.\FixingUnitysAudioProblem\DisableUnityAudio)
+![The project settings window, with the Disable Unity Audio option highlighted](./FixingUnitysAudioProblem/DisableUnityAudio)
 
 That's it for the setup, let's move on to the implementations!
 
